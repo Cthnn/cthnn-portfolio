@@ -1,28 +1,45 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+// Global Vars
 
-// Define Scene, Camera, and Renderer
-const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x3760a7 );
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// Define constants
+var BGCOLOR = 0x3760a7; //dark blue
+var spawnCounter = 0;
+var clouds = [];
+
+// Define Scene
+var scene = new THREE.Scene();
+scene.background = new THREE.Color( BGCOLOR );
+
+// Define Camera
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.set(-3.5,0,5);
-const renderer = new THREE.WebGLRenderer();
+
+// Define Renderer
+var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop( animate );
 document.body.appendChild( renderer.domElement );
 
-// Define a texture loader 
-const textureloader = new THREE.TextureLoader();
+// Define a texture loader
+var textureloader = new THREE.TextureLoader();
 
-const me = loadTexture(textureloader, "assets/me.jpg");
-const bean = loadTexture(textureloader, "assets/bean.png");
-const headshot = loadTexture(textureloader, "assets/headshot.jpg");
-const doja = loadTexture(textureloader, "assets/doja.jpg");
-const masked = loadTexture(textureloader, "assets/masked.jpg");
-const art = loadTexture(textureloader, "assets/art.jpg");
+// Lighting
+var cameralight = new THREE.RectAreaLight( 0xffffff, 1, 20, 20 );
+cameralight.position.set(0,5,0);
+cameralight.lookAt(0,0,0);
+scene.add( cameralight );
 
-const cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
-const cubeTexture = [
+// Define Textures
+var me = loadTexture(textureloader, "assets/me.jpg");
+var bean = loadTexture(textureloader, "assets/bean.png");
+var headshot = loadTexture(textureloader, "assets/headshot.jpg");
+var doja = loadTexture(textureloader, "assets/doja.jpg");
+var masked = loadTexture(textureloader, "assets/masked.jpg");
+var art = loadTexture(textureloader, "assets/art.jpg");
+
+var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
+var cubeTexture = [
     createTexturedMaterial({map: bean}, THREE.MeshBasicMaterial),
     createTexturedMaterial({map: me}, THREE.MeshBasicMaterial),
     createTexturedMaterial({map: doja}, THREE.MeshBasicMaterial),
@@ -30,7 +47,22 @@ const cubeTexture = [
     createTexturedMaterial({map: headshot}, THREE.MeshBasicMaterial),
     createTexturedMaterial({map: masked}, THREE.MeshBasicMaterial),
 ];
-const cube = new THREE.Mesh(cubeGeometry, cubeTexture);
+var cube = new THREE.Mesh(cubeGeometry, cubeTexture);
+scene.add( cube );
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+};
+
+function loadTexture(textureloader, textureName){
+    const texture = textureloader.load(textureName);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+};
+
+function createTexturedMaterial(texture, MaterialFunction){
+    return new MaterialFunction(texture);
+};
 
 function createCloud(){
     const sphereGeo = new THREE.SphereGeometry(.50,32,32);
@@ -46,7 +78,11 @@ function createCloud(){
     sphere3Geo.translate(-3.7,0,0.4);
 
     const cloudGeo = BufferGeometryUtils.mergeGeometries([sphereGeo, sphere1Geo, sphere2Geo, sphere3Geo]);
-    const x = 5;
+    sphereGeo.dispose();
+    sphere1Geo.dispose();
+    sphere2Geo.dispose();
+    sphere3Geo.dispose();
+    const x = getRandomArbitrary(10,15);
     const y= getRandomArbitrary(-3,3);
     const z = getRandomArbitrary(-5,4);
     cloudGeo.translate(x,y,z);
@@ -55,76 +91,53 @@ function createCloud(){
     const resCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
     
     return resCloud;
-}
-// Lighting
-// const pointLight1 = new THREE.PointLight(0xffffff);
-// pointLight1.position.set(0,2,0);
-// const pointLight2 = new THREE.PointLight(0xffffff);
-// pointLight2.position.set(0,-2,0);
-// const pointLight3 = new THREE.PointLight(0xffffff);
-// pointLight3.position.set(2,0,0);
-// const pointLight4 = new THREE.PointLight(0xffffff);
-// pointLight4.position.set(-2,0,0);
-// const pointLight5 = new THREE.PointLight(0xffffff);
-// pointLight5.position.set(0,0,2);
-// const pointLight6 = new THREE.PointLight(0xffffff);
-// pointLight6.position.set(0,0,-2);
-// scene.add(pointLight1);
-// scene.add(pointLight2);
-// scene.add(pointLight3);
-// scene.add(pointLight4);
-// scene.add(pointLight5);
-// scene.add(pointLight6);
-//Camera light
-// const cameralight = new THREE.HemisphereLight( 0xffffff, 0x080820, 1 );
-const cameralight = new THREE.RectAreaLight( 0xffffff, 1, 20, 20 );
-cameralight.position.set(0,2,0);
-cameralight.lookAt(0,0,0);
+};
 
-scene.add( cameralight );
-//ambient light
-// const ambientlight = new THREE.AmbientLight( 0xffffff ); // soft white light
-// scene.add( ambientlight );
-scene.add( cube );
+function addCloud(){
+    var cloud = createCloud();
+    clouds.push([cloud.uuid,0.01*getRandomArbitrary(1,5)]);
+    scene.add(cloud);
+};
 
-console.log(camera.position);
-console.log(cameralight.position);
-var clouds = [];
+function despawnCloud(cloud){
+    cloud.geometry.dispose();
+    cloud.material.dispose();
+    scene.remove(cloud);
+};
 
-function loadTexture(textureloader, textureName){
-    const texture = textureloader.load(textureName);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-}
-function createTexturedMaterial(texture, MaterialFunction){
-    return new MaterialFunction(texture);
-}
-
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
-var spawnCounter = 0;
 function animate() {
 
     // Rotate Cube (Turn this into a function)
 	cube.rotation.x += 0.01;
 	cube.rotation.y += 0.01;
-    if (spawnCounter == 0){
-        spawnCounter = 300;
+    
+    // Spawn Cloud when counter is 0
+    if (spawnCounter <= 0){
+        spawnCounter = getRandomArbitrary(100,500);
         addCloud();
     };
-
     spawnCounter -= 1;
 
+    // Move Clouds
+    var newClouds = [];
     for(let i = 0; i < clouds.length; i++){
-        clouds[i].position.x -= 0.01;
-    }
+
+        var currentCloud = scene.getObjectByProperty('uuid', clouds[i][0]);
+        var push = true;
+        currentCloud.position.x -= clouds[i][1];
+
+        if (currentCloud.position.x <= -30){
+            despawnCloud(currentCloud);
+            push = false;
+        };
+
+        if (push){
+            newClouds.push(clouds[i]);
+        };
+
+    };
+    clouds = newClouds;
 
 	renderer.render( scene, camera );
 
-}
-function addCloud(){
-    const cloud = createCloud();
-    clouds.push(cloud);
-    scene.add(cloud);
-}
+};
