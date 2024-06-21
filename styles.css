@@ -1,0 +1,48 @@
+body{
+    overflow:hidden;
+    margin:0;
+}
+#content {
+    position: relative;
+    width:100vw;
+    height:100vh;
+}
+.header{
+    position: absolute;
+    width:100vw;
+    height:100vh;
+    z-index: 1; /* Ensure the logo is on top */
+    display:flex;
+
+}
+.nav{
+    position:absolute;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content: flex-start;
+}
+.nav-link {
+    color: #ffffff;
+    padding: 0 8px 20px;
+    text-decoration: none;
+    z-index: 1;
+}
+.themes{
+    padding: 10px;
+    z-index: 1;
+}
+.logo {
+    padding-top:15px;
+    max-width: 15vw; /* Ensure the image doesn't exceed the container's width */
+    max-height: 15vh; /* Ensure the image doesn't exceed the container's height */
+    z-index:1;
+}
+.main{
+    position:absolute;
+    width:100vw;
+    height:100vh;
+    z-index:0;
+}

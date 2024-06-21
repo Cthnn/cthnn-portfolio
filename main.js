@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 // Global Vars
 
 // Define constants
@@ -19,15 +21,15 @@ camera.position.set(-3.5,0,5);
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop( animate );
-document.body.appendChild( renderer.domElement );
+document.querySelector('#content').appendChild(renderer.domElement);
 
 // Define a texture loader
 var textureloader = new THREE.TextureLoader();
 
 // Lighting
-var cameralight = new THREE.RectAreaLight( 0xffffff, 1, 20, 20 );
-cameralight.position.set(0,5,0);
-cameralight.lookAt(0,0,0);
+var cameralight = new THREE.RectAreaLight( 0xffffff, 1, 30, 30 );
+cameralight.position.set(-10,10,5);
+cameralight.lookAt(10,0,0);
 scene.add( cameralight );
 
 // Define Textures
@@ -50,6 +52,52 @@ var cubeTexture = [
 var cube = new THREE.Mesh(cubeGeometry, cubeTexture);
 scene.add( cube );
 
+document.addEventListener('DOMContentLoaded', () => {
+    const logo = document.getElementById('logo');
+    const home = document.getElementById('home');
+    home.addEventListener('click',() => {
+        console.log("clicked");
+        BGCOLOR = 0x000000;
+        scene.background = new THREE.Color( BGCOLOR );
+        var texts = scene.getObjectsByProperty('geoType', "text");
+        for(let i = 0; i < texts.length; i++){
+            texts[i].material = createTexturedMaterial({ color:  0xffff00 }, THREE.MeshStandardMaterial);
+        }
+    });
+    logo.addEventListener('mousedown', () => {
+        addCloud();
+    });
+});
+
+var loader = new FontLoader();
+
+loader.load( 'node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json',(font) =>{
+
+	var textgeo = new TextGeometry( 'HI,', {
+		size: 1,
+        height: 1,
+        depth: 0.1,
+        font: font,
+        bevelSize: 0.1,
+        bevelThickness: 0.1,
+	} );
+    var textgeo1 = new TextGeometry( 'IM ETHAN', {
+		size: 1,
+        height: 1,
+        depth: 0.1,
+        font: font,
+        bevelSize: 0.1,
+        bevelThickness: 0.1,
+	} );
+    textgeo.translate(-12.5,1,-1);
+    textgeo1.translate(-12.5,-0.5,-1);
+    var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
+    const textMaterial = createTexturedMaterial({ color: 0xffffff }, THREE.MeshStandardMaterial);
+    var introText = new THREE.Mesh(introgeo,textMaterial);
+    introText.geoType = "text";
+    scene.add( introText );
+} );
+
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 };
@@ -65,10 +113,10 @@ function createTexturedMaterial(texture, MaterialFunction){
 };
 
 function createCloud(){
-    const sphereGeo = new THREE.SphereGeometry(.50,32,32);
+    const sphereGeo = new THREE.SphereGeometry(.50,30,30);
     sphereGeo.translate(-4,0,0);
     
-    const sphere1Geo = new THREE.SphereGeometry(.50,32,32);
+    const sphere1Geo = new THREE.SphereGeometry(.50,30,30);
     sphere1Geo.translate(-3.4,0,0);
 
     const sphere2Geo = new THREE.SphereGeometry(.50,32,32);

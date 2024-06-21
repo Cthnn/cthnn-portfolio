@@ -2,10 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>My first three.js app</title>
-		<style>
-			body { margin: 0; }
-		</style>
+		<title>Ethan-Cheung's Portfolio</title>
+		<link rel="stylesheet" type="text/css" href="styles.css">
 		<script type="importmap">
 			{
 			  "imports": {
@@ -13,9 +11,22 @@
 				"three/addons/": "https://cdn.jsdelivr.net/npm/three@<version>/examples/jsm/"
 			  }
 			}
-		  </script>
+		  </script>	
 	</head>
 	<body>
-		<script type="module" src="/main.js"></script>
+		<div id="content">
+			<div class="header"></div>
+				<div class="nav">
+					<img src="assets/White_Logo.svg" id="logo" class="logo"/>
+					<div class="themes">
+						<a href="#Home" id="home" class="nav-link">Home</a>
+						<a href="#About" class="nav-link">About</a>
+						<a href="#Projects" class="nav-link">Projects</a>
+						<a href="#Contact" class="nav-link">Contact</a>
+					</div>
+				</div>
+			</div>
+			<script type="module" src="/main.js" class="main"></script>
+		</div>
 	</body>
 </html>
