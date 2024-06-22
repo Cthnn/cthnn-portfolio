@@ -11,11 +11,13 @@ var loader = initThreeOutputs[2];
 var renderer = initThreeOutputs[3];
 var textureloader = initThreeOutputs[4];
 
-// Define Theme variables
-var PRIMARY = 0x3760a7; //dark blue
-var SECONDARY = 0xffffff;
-var NAVCOLOR = 0xffffff;
-var THEME = "home";
+var THEMES = {
+    "home": {primary:0x3760a7, secondary:0xffffff, navcolor:0xffffff},
+    "about": {primary:0x858585, secondary:0xe6e600, navcolor:0xe6e600},
+    "projects": {primary:0x292929, secondary:0xffff00, navcolor:0x858585},
+    "contact": {primary:0xaaaaee, secondary:0xffe4b3, navcolor:0xffe4b3},
+}
+var THEME = getCurrentPage();
 
 //Timer 
 var spawnCounter = 0;
@@ -24,6 +26,7 @@ var textMesh = null;
 
 // Initialize Home Page Geometries
 initHomeGeos();
+changeTheme(THEME);
 spawnObjects();
 
 function initThree(){
@@ -57,16 +60,13 @@ function initThree(){
     return [scene, camera, loader, renderer, textureloader];
 }
 
-function changeTheme(primary, secondary, navcolor, theme){
+function changeTheme(theme){
     // Change theme colors
-    PRIMARY = primary;
-    SECONDARY = secondary;
-    NAVCOLOR = navcolor;
     THEME = theme;
 
     // Update background
     var body = document.querySelector('body');
-    body.style.backgroundColor = hexToHexString(PRIMARY);
+    body.style.backgroundColor = hexToHexString(THEMES[THEME].primary);
     var bgImage = null;
     if (THEME == "contact"){
         bgImage = "linear-gradient(#aaaaee 0%, #aaaaee 40%, #ff8566 50%, #ffe4b3 80%)";
@@ -76,21 +76,60 @@ function changeTheme(primary, secondary, navcolor, theme){
     
     // Update Nav
     var logo =  document.getElementById('logo');
-    logo.style.fill = hexToHexString(NAVCOLOR);
+    logo.style.fill = hexToHexString(THEMES[THEME].navcolor);
     var navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link =>{
-        link.style.color = hexToHexString(NAVCOLOR);
+        link.style.color = hexToHexString(THEMES[THEME].navcolor);
     });
 };
 
 function spawnObjects(){
     if (THEME == 'home'){
         scene.add(cube);
-        if(textMesh && scene.getObjectByProperty('geoType',"text").length <= 1){
+        if(textMesh && scene.getObjectsByProperty('geoType',"text").length <= 1){
             scene.add(textMesh);
         };
-    }
-}
+    }else if(THEME =="about"){
+        if (!document.getElementById('about-box')) {
+            // Create a new div element
+            var aboutBox = document.createElement('div');
+            aboutBox.id = 'about-box';
+            var innerAbout = document.createElement('div');
+            innerAbout.id = "inner-about";
+            var maskImage = document.createElement('img');
+            maskImage.src = 'assets/masked.jpg';
+            maskImage.id = "mask-image";
+            var aboutMe = document.createElement('div');
+            aboutMe.id = "about-me";
+            var aboutMeTxt = document.createElement('h1');
+            aboutMeTxt.textContent = "About Me"
+            var bioTxt1 = document.createElement('p');
+            bioTxt1.textContent = "Hello! My name is Ethan Cheung and welcome to my portfolio. Firstly, let me introduce myself as a Software Developer. I have experience building industry leading software in Cloud Infrastructure, MLOps, Cybersecurity & Privacy, Data Science, and AI & Machine Learning. Most recently, I am working as a Platform Engineer at Agility Robotics."
+            var bioTxt2 = document.createElement('p');
+            bioTxt2.textContent = "Now for the interesting part. You're probably wondering \"What's up with the clouds\". Well that's simple, my Chinese name means Smiling Cloud. As you continue to explore my portfolio, I want to share an experience that represents myself and to share a mix of my passions. I'm excited about creating impactful software and like to make it fun along the way. On my freetime you'll catch me keeping up with the latest in AR/VR & Graphics Technology, taking pictures, running with my Husky and Machine Learning. I'm excited to be sharing a piece of my journey and deliver an amazing experience through my portfolio showcasing my passion and creativity for building software."
+            var bioTxt3 = document.createElement('p');
+            bioTxt3.textContent = "Ethan Cheung";
+            var bioTxt4 = document.createElement('p');
+            bioTxt4.textContent = "P.S. Press the logo to spawn some more clouds"
+            aboutMe.appendChild(aboutMeTxt);
+            aboutMe.appendChild(bioTxt1);
+            aboutMe.appendChild(bioTxt2);
+            aboutMe.appendChild(bioTxt3);
+            aboutMe.appendChild(bioTxt4);
+            innerAbout.appendChild(maskImage);
+            innerAbout.appendChild(aboutMe);
+            aboutBox.appendChild(innerAbout);
+            // Append the new div to the content div
+            document.getElementById('nav').appendChild(aboutBox);
+        };
+    }else if(THEME == "projects"){
+        console.log("test");
+    }else if(THEME == "contact"){
+        var contactBox = document.createElement('div');
+        contactBox.id = 'contact-box';
+        document.getElementById('nav').appendChild(contactBox);
+    };
+};
 
 function initHomeGeos(){
     var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
@@ -122,7 +161,7 @@ function initHomeGeos(){
         textgeo.translate(-12,0,-1);
         textgeo1.translate(-12,-1.5,-1);
         var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
-        var textMaterial = createTexturedMaterial({ color: SECONDARY }, THREE.MeshStandardMaterial);
+        var textMaterial = createTexturedMaterial({ color: THEMES[THEME].secondary }, THREE.MeshStandardMaterial);
         var introText = new THREE.Mesh(introgeo,textMaterial);
         introText.geoType = "text";
         textMesh = introText;
@@ -226,67 +265,41 @@ function createNavEventListeners(){
 
         var home = document.getElementById('home');
         home.addEventListener('mousedown',() => {
-            changeTheme(0x3760a7, 0xffffff, 0xffffff, 'home');
+            changeTheme('home');
             clearObjects();
             spawnObjects();
         });
         var about = document.getElementById('about');
         about.addEventListener('mousedown',() => {
-            changeTheme(0x858585, 0xe6e600, 0xe6e600, 'about');
+            changeTheme('about');
             clearObjects();
             spawnObjects();
-            if (!document.getElementById('about-box')) {
-                // Create a new div element
-                var aboutBox = document.createElement('div');
-                aboutBox.id = 'about-box';
-                var innerAbout = document.createElement('div');
-                innerAbout.id = "inner-about";
-                var maskImage = document.createElement('img');
-                maskImage.src = 'assets/masked.jpg';
-                maskImage.id = "mask-image";
-                var aboutMe = document.createElement('div');
-                aboutMe.id = "about-me";
-                var aboutMeTxt = document.createElement('h1');
-                aboutMeTxt.textContent = "About Me"
-                var bioTxt1 = document.createElement('p');
-                bioTxt1.textContent = "Hello! My name is Ethan Cheung and welcome to my portfolio. Firstly, let me introduce myself as a Software Developer. I have experience building industry leading software in Cloud Infrastructure, MLOps, Cybersecurity & Privacy, Data Science, and AI & Machine Learning. Most recently, I am working as a Platform Engineer at Agility Robotics."
-                var bioTxt2 = document.createElement('p');
-                bioTxt2.textContent = "Now for the interesting part. You're probably wondering \"What's up with the clouds\". Well that's simple, my Chinese name means Smiling Cloud. As you continue to explore my portfolio, I want to share an experience that represents myself and to share a mix of my passions. I'm excited about creating impactful software and like to make it fun along the way. On my freetime you'll catch me keeping up with the latest in AR/VR & Graphics Technology, taking pictures, running with my Husky and Machine Learning. I'm excited to be sharing a piece of my journey and deliver an amazing experience through my portfolio showcasing my passion and creativity for building software."
-                var bioTxt3 = document.createElement('p');
-                bioTxt3.textContent = "Ethan Cheung";
-                var bioTxt4 = document.createElement('p');
-                bioTxt4.textContent = "P.S. Press the logo to spawn some more clouds"
-                aboutMe.appendChild(aboutMeTxt);
-                aboutMe.appendChild(bioTxt1);
-                aboutMe.appendChild(bioTxt2);
-                aboutMe.appendChild(bioTxt3);
-                aboutMe.appendChild(bioTxt4);
-                innerAbout.appendChild(maskImage);
-                innerAbout.appendChild(aboutMe);
-                aboutBox.appendChild(innerAbout);
-                // Append the new div to the content div
-                document.getElementById('nav').appendChild(aboutBox);
-            };
         });
 
         var projects = document.getElementById('projects');
         projects.addEventListener('mousedown',() => {
-            changeTheme(0x292929, 0xffff00, 0x858585, 'projects');
+            changeTheme('projects');
             clearObjects();
             spawnObjects();
         });
 
         var contact = document.getElementById('contact');
         contact.addEventListener('mousedown',() => {
-            changeTheme(0xaaaaee, 0xffe4b3, 0xffe4b3,'contact');
+            changeTheme('contact');
             clearObjects();
             spawnObjects();
-            var contactBox = document.createElement('div');
-            contactBox.id = 'contact-box';
-            document.getElementById('nav').appendChild(contactBox);
         });
     });
 };
+function getCurrentPage() {
+    let hash = window.location.hash;
+    if (hash) {
+      // Remove the '#' character
+      return hash.substring(1).toLowerCase();
+    } else {
+      return 'home'; // or whatever you consider the default page
+    };
+  };
 
 function animate() {
 
