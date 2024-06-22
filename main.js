@@ -10,6 +10,8 @@ var SECONDARY = 0xffffff;
 var NAVCOLOR = 0xffffff;
 var THEME = "home";
 var spawnCounter = 0;
+var loader = new FontLoader();
+var textMesh = null;
 
 // Define Scene
 var scene = new THREE.Scene();
@@ -28,6 +30,28 @@ document.querySelector('#content').appendChild(renderer.domElement);
 
 // Define a texture loader
 var textureloader = new THREE.TextureLoader();
+
+// Define main geos
+// Define Cube Textures
+var me = loadTexture(textureloader, "assets/me.jpg");
+var bean = loadTexture(textureloader, "assets/bean.png");
+var headshot = loadTexture(textureloader, "assets/headshot.jpg");
+var doja = loadTexture(textureloader, "assets/doja.jpg");
+var masked = loadTexture(textureloader, "assets/masked.jpg");
+var art = loadTexture(textureloader, "assets/art.jpg");
+
+var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
+var cubeTexture = [
+    createTexturedMaterial({map: bean}, THREE.MeshBasicMaterial),
+    createTexturedMaterial({map: me}, THREE.MeshBasicMaterial),
+    createTexturedMaterial({map: doja}, THREE.MeshBasicMaterial),
+    createTexturedMaterial({map: art}, THREE.MeshBasicMaterial),
+    createTexturedMaterial({map: headshot}, THREE.MeshBasicMaterial),
+    createTexturedMaterial({map: masked}, THREE.MeshBasicMaterial),
+];
+// Define Cube Mesh
+var cube = new THREE.Mesh(cubeGeometry, cubeTexture);
+cube.geoType = "cube";
 
 // Lighting
 var cameralight = new THREE.RectAreaLight( 0xffffff, 1, 30, 30 );
@@ -65,7 +89,25 @@ document.addEventListener('DOMContentLoaded', () => {
             var maskImage = document.createElement('img');
             maskImage.src = 'assets/masked.jpg';
             maskImage.id = "mask-image";
+            var aboutMe = document.createElement('div');
+            aboutMe.id = "about-me";
+            var aboutMeTxt = document.createElement('h1');
+            aboutMeTxt.textContent = "About Me"
+            var bioTxt1 = document.createElement('p');
+            bioTxt1.textContent = "Hello! My name is Ethan Cheung and welcome to my portfolio. Firstly, let me introduce myself as a Software Developer. I have experience building industry leading software in Cloud Infrastructure, MLOps, Cybersecurity & Privacy, Data Science, and AI & Machine Learning. Most recently, I am working as a Platform Engineer at Agility Robotics."
+            var bioTxt2 = document.createElement('p');
+            bioTxt2.textContent = "Now for the interesting part. You're probably wondering \"What's up with the clouds\". Well that's simple, my Chinese name means Smiling Cloud. As you continue to explore my portfolio, I want to share an experience that represents myself and to share a mix of my passions. I'm excited about creating impactful software and like to make it fun along the way. On my freetime you'll catch me keeping up with the latest in AR/VR & Graphics Technology, taking pictures, running with my Husky and Machine Learning. I'm excited to be sharing a piece of my journey and deliver an amazing experience through my portfolio showcasing my passion and creativity for building software."
+            var bioTxt3 = document.createElement('p');
+            bioTxt3.textContent = "-Ethan Cheung";
+            var bioTxt4 = document.createElement('p');
+            bioTxt4.textContent = "P.S. Press the logo to spawn some more clouds"
+            aboutMe.appendChild(aboutMeTxt);
+            aboutMe.appendChild(bioTxt1);
+            aboutMe.appendChild(bioTxt2);
+            aboutMe.appendChild(bioTxt3);
+            aboutMe.appendChild(bioTxt4);
             innerAbout.appendChild(maskImage);
+            innerAbout.appendChild(aboutMe);
             aboutBox.appendChild(innerAbout);
             // Append the new div to the content div
             document.getElementById('nav').appendChild(aboutBox);
@@ -125,56 +167,59 @@ function spawnObjects(){
 }
 
 function spawnHomeObjects(){
-    // Define Cube Textures
-    var me = loadTexture(textureloader, "assets/me.jpg");
-    var bean = loadTexture(textureloader, "assets/bean.png");
-    var headshot = loadTexture(textureloader, "assets/headshot.jpg");
-    var doja = loadTexture(textureloader, "assets/doja.jpg");
-    var masked = loadTexture(textureloader, "assets/masked.jpg");
-    var art = loadTexture(textureloader, "assets/art.jpg");
-
-    var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
-    var cubeTexture = [
-        createTexturedMaterial({map: bean}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: me}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: doja}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: art}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: headshot}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: masked}, THREE.MeshBasicMaterial),
-    ];
-    // Define Cube Mesh
-    var cube = new THREE.Mesh(cubeGeometry, cubeTexture);
-    cube.geoType = "cube";
-    scene.add( cube );
-
-    var loader = new FontLoader();
     // Load Font
-    loader.load( 'node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json',(font) =>{
+    scene.add( cube );
+    if(!scene.getObjectByProperty("geoType","text")){
+        if(!textMesh){
+            loader.load( 'node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json',(font) =>{
+                var textgeo = new TextGeometry( 'HI,', {
+                    size: 1,
+                    height: 1,
+                    depth: 0.1,
+                    font: font,
+                    bevelSize: 1,
+                    bevelThickness: 1,
+                } );
+                var textgeo1 = new TextGeometry( 'IM ETHAN', {
+                    size: 1,
+                    height: 1,
+                    depth: 0.1,
+                    font: font,
+                    bevelSize: 1,
+                    bevelThickness: 1,
+                } );
+                textgeo.translate(-12.5,1,-1);
+                textgeo1.translate(-12.5,-0.5,-1);
+                var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
+                var textMaterial = createTexturedMaterial({ color: SECONDARY }, THREE.MeshStandardMaterial);
+                var introText = new THREE.Mesh(introgeo,textMaterial);
+                introText.geoType = "text";
+                textMesh = introText;
+                scene.add(introText);
+            });
+        }else{
+            scene.add(textMesh);
+        }
+    }
+    // var triangle1 = new THREE.Shape();
+    // triangle1.moveTo(0,-5);
+    // triangle1.moveTo(5,-5);
+    // triangle1.moveTo(0,0);
+    var x = 0, y = 0;
 
-        var textgeo = new TextGeometry( 'HI,', {
-            size: 1,
-            height: 1,
-            depth: 0.1,
-            font: font,
-            bevelSize: 0.1,
-            bevelThickness: 0.1,
-        } );
-        var textgeo1 = new TextGeometry( 'IM ETHAN', {
-            size: 1,
-            height: 1,
-            depth: 0.1,
-            font: font,
-            bevelSize: 0.1,
-            bevelThickness: 0.1,
-        } );
-        textgeo.translate(-12.5,1,-1);
-        textgeo1.translate(-12.5,-0.5,-1);
-        var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
-        var textMaterial = createTexturedMaterial({ color: SECONDARY }, THREE.MeshStandardMaterial);
-        var introText = new THREE.Mesh(introgeo,textMaterial);
-        introText.geoType = "text";
-        scene.add( introText );
-    } );
+    var heartShape = new THREE.Shape();
+
+    heartShape.moveTo(x , y - .5);
+    heartShape.moveTo(x + .5, y - .5);
+    heartShape.moveTo(x,y);
+
+    var triangle1Geo = new THREE.ShapeGeometry(heartShape);
+    triangle1Geo.translate(-5,0,0);
+    var triangle1Mesh = new THREE.Mesh(triangle1Geo, createTexturedMaterial({ color:0x000000 }, THREE.MeshStandardMaterial));
+    scene.add(triangle1Mesh);
+    console.log(triangle1Mesh.position);
+    
+
 
 };
 
@@ -241,19 +286,19 @@ function despawnCloud(cloud){
     scene.remove(cloud);
 };
 function clearObjects(){
-    var objs = scene.children;
-    while (objs.length > 1){
-        var mesh = objs[objs.length-1];
-        mesh.geometry.dispose();
-        if (mesh.material instanceof Array){
-            mesh.material.forEach(material =>{
-                material.dispose();
-            });
-        }else{
-            mesh.material.dispose();
-        }
-        scene.remove(mesh); 
-    };
+    var clouds = scene.getObjectsByProperty('geoType', 'cloud');
+    clouds.forEach(cloud =>{
+        despawnCloud(cloud);
+    })
+    scene.remove(cube);
+    if(textMesh){
+        scene.remove(textMesh);
+    }
+    scene.remove()
+    var aboutBox = document.getElementById('about-box');
+    if (aboutBox) {
+        aboutBox.remove();
+    }
 }
 function animate() {
 
