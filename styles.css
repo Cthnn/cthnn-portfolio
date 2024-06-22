@@ -1,6 +1,8 @@
 body{
     overflow:hidden;
     margin:0;
+    background-color: #3760a7;
+    /* background-image: linear-gradient(#aaaaee 0%, #aaaaee 50%, #ffa500 100%) */
 }
 #content {
     position: relative;
@@ -36,9 +38,39 @@ body{
 }
 .logo {
     padding-top:15px;
-    max-width: 15vw; /* Ensure the image doesn't exceed the container's width */
-    max-height: 15vh; /* Ensure the image doesn't exceed the container's height */
+    max-width: 20vw; /* Ensure the image doesn't exceed the container's width */
+    max-height: 20vh; /* Ensure the image doesn't exceed the container's height */
     z-index:1;
+    fill:#ffffff;
+}
+#about-box{
+    width:70vw;
+    height:70vh;
+    border: 2px solid yellow;
+    border-radius: 15px;
+    margin-top: 30px;
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items:center;
+    z-index: 1;
+}
+#inner-about{
+    width:69vw;
+    height:67vh;
+    background-color: rgba(92, 92, 92, 0.7);
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+    z-index: 1;
+}
+#mask-image{
+    width:30vw;
+    height:30vw;
+    z-index:1;
+    margin:3vh;
 }
 .main{
     position:absolute;
