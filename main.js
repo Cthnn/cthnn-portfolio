@@ -11,6 +11,7 @@ var renderer = initThreeOutputs[3];
 var textureloader = initThreeOutputs[4];
 var pointer = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
+var selected = null;
 createNavEventListeners();
 
 
@@ -245,10 +246,11 @@ function createCloud(){
     var x = getRandomArbitrary(10,15);
     var y= getRandomArbitrary(-3,3);
     var z = getRandomArbitrary(-5,4);
-    cloudGeo.translate(x,y,z);
+
     var cloudMaterial = createTexturedMaterial({ color: 0xffffff }, THREE.MeshStandardMaterial);
 
     var resCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
+    resCloud.position.set(x,y,z);
     resCloud.geoType = 'cloud';
     return resCloud;
 };
@@ -256,6 +258,7 @@ function createCloud(){
 function addCloud(){
     var cloud = createCloud();
     cloud.speed = 0.01*getRandomArbitrary(1,5);
+    cloud.move = true;
     scene.add(cloud);
 };
 
@@ -287,25 +290,38 @@ function clearObjects(){
 
 function createNavEventListeners(){
     document.addEventListener('mousemove', (event) =>{
-        console.log("mouse moved");
         pointer.x = (event.clientX/window.innerWidth)*2 - 1;
         pointer.y = -(event.clientY/window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
     });
     document.addEventListener('mousedown', (event)=>{
-        var intersects = raycaster.intersectObjects(scene.children);
-        var cloud = null;
-        var i = 0;
-        while (cloud == null && i < intersects.length){
-            if(intersects[i].object.geoType == 'cloud'){
-                cloud = intersects[i].object;
-                cloud.material.color.set(0xff0000);
-                console.log("change cloud color");
-                break;
+        pointer.x = (event.clientX/window.innerWidth)*2 - 1;
+        pointer.y = -(event.clientY/window.innerHeight) * 2 + 1;
+        if(selected == null){
+            var intersects = raycaster.intersectObjects(scene.children);
+            var cloud = null;
+            var i = 0;
+            while (cloud == null && i < intersects.length){
+                if(intersects[i].object.geoType == 'cloud'){
+                    cloud = intersects[i].object;
+                    selected = cloud;
+                    cloud.material.color.set(0xff0000);
+                    cloud.move = false;
+                    break;
+                };
+                i+=1;
             };
-            i+=1;
         };
-    })
+        
+    });
+    document.addEventListener('mouseup', (event)=>{
+        if(selected){
+            var tempSelected = selected;
+            selected = null;
+            tempSelected.material.color.set(0xffffff);
+            tempSelected.move = true;    
+        }
+    });
     document.addEventListener('DOMContentLoaded', () => {
 
         var logo = document.getElementById('logo');
@@ -358,7 +374,7 @@ function animate() {
         spawnCounter = getRandomArbitrary(100,500);
         addCloud();
     };
-    spawnCounter -= 1;
+    spawnCounter -= 0;
 
     // Rotate Cube (Turn this into a function)
     var cubes = scene.getObjectsByProperty('geoType', 'cube');
@@ -372,11 +388,20 @@ function animate() {
     }
 
     // Move Clouds
+    // if(selected){
+    //     var intersects = new THREE.Vector3();
+    //     var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -selected.position.z);
+    //     raycaster.ray.intersectPlane(plane,intersects);
+    //     console.log(intersects);
+    //     selected.position.set(intersects.x+4,intersects.y-0.5,intersects.z);
+    // };
     var clouds = scene.getObjectsByProperty('geoType', 'cloud');
     for(let i = 0; i < clouds.length; i++){
 
         var currentCloud = clouds[i];
-        currentCloud.position.x -= currentCloud.speed;
+        if (currentCloud.move){
+            currentCloud.position.x -= currentCloud.speed;
+        }
 
         if (currentCloud.position.x <= -30){
             despawnCloud(currentCloud);
