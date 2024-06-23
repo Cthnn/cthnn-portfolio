@@ -3,13 +3,16 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 // Initialization
-createNavEventListeners();
 var initThreeOutputs = initThree();
 var scene = initThreeOutputs[0];
 var camera = initThreeOutputs[1];
 var loader = initThreeOutputs[2];
 var renderer = initThreeOutputs[3];
 var textureloader = initThreeOutputs[4];
+var pointer = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+createNavEventListeners();
+
 
 var THEMES = {
     "home": {primary:0x3760a7, secondary:0xffffff, navcolor:0xffffff},
@@ -106,7 +109,7 @@ function spawnObjects(){
             var bioTxt1 = document.createElement('p');
             bioTxt1.textContent = "Hello! My name is Ethan Cheung and welcome to my portfolio. Firstly, let me introduce myself as a Software Developer. I have experience building industry leading software in Cloud Infrastructure, MLOps, Cybersecurity & Privacy, Data Science, and AI & Machine Learning. Most recently, I am working as a Platform Engineer at Agility Robotics."
             var bioTxt2 = document.createElement('p');
-            bioTxt2.textContent = "Now for the interesting part. You're probably wondering \"What's up with the clouds\". Well that's simple, my Chinese name means Smiling Cloud. As you continue to explore my portfolio, I want to share an experience that represents myself and to share a mix of my passions. I'm excited about creating impactful software and like to make it fun along the way. On my freetime you'll catch me keeping up with the latest in AR/VR & Graphics Technology, taking pictures, running with my Husky and Machine Learning. I'm excited to be sharing a piece of my journey and deliver an amazing experience through my portfolio showcasing my passion and creativity for building software."
+            bioTxt2.textContent = "Now for the interesting part. You're probably wondering \"What's up with the clouds?\". Well that's simple, my Chinese name means Smiling Cloud. As you continue to explore my portfolio, I want to share an experience that represents myself and to share a mix of my passions. I'm excited about creating impactful software and like to make it fun along the way. On my freetime you'll catch me keeping up with the latest in AR/VR & Graphics technology, taking pictures, running with my Husky or practicing my juggling skills with the Diabolo. I'm excited to be sharing an experience through my portfolio showcasing my passion and creativity for building software."
             var bioTxt3 = document.createElement('p');
             bioTxt3.textContent = "Ethan Cheung";
             var bioTxt4 = document.createElement('p');
@@ -127,6 +130,34 @@ function spawnObjects(){
     }else if(THEME == "contact"){
         var contactBox = document.createElement('div');
         contactBox.id = 'contact-box';
+        var form = document.createElement('form');
+        contactBox.appendChild(form);
+        var h1 = document.createElement('h2');
+        h1.textContent = "Send Me A Message"
+        var name = document.createElement('input');
+        name.type = "text";
+        name.placeholder = "Name*"
+        name.required = true;
+        var email = document.createElement('input');
+        email.type = "text";
+        email.placeholder = "Email*"
+        email.required = true;
+        var message = document.createElement('textarea');
+        message.placeholder = "Your Message*"
+        message.rows = 6;
+        message.required = true;
+        var send = document.createElement('div');
+        send.id = "send";
+        var sendbutton = document.createElement('button');
+        sendbutton.id = "send-button"
+        sendbutton.type = "submit";
+        sendbutton.textContent = "Send";
+        send.appendChild(sendbutton);
+        form.appendChild(h1);
+        form.appendChild(name);
+        form.appendChild(email);
+        form.appendChild(message);
+        form.appendChild(send);
         document.getElementById('nav').appendChild(contactBox);
     };
 };
@@ -226,7 +257,6 @@ function addCloud(){
     var cloud = createCloud();
     cloud.speed = 0.01*getRandomArbitrary(1,5);
     scene.add(cloud);
-    console.log(scene.children);
 };
 
 function despawnCloud(cloud){
@@ -256,13 +286,33 @@ function clearObjects(){
 };
 
 function createNavEventListeners(){
+    document.addEventListener('mousemove', (event) =>{
+        console.log("mouse moved");
+        pointer.x = (event.clientX/window.innerWidth)*2 - 1;
+        pointer.y = -(event.clientY/window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+    });
+    document.addEventListener('mousedown', (event)=>{
+        var intersects = raycaster.intersectObjects(scene.children);
+        var cloud = null;
+        var i = 0;
+        while (cloud == null && i < intersects.length){
+            if(intersects[i].object.geoType == 'cloud'){
+                cloud = intersects[i].object;
+                cloud.material.color.set(0xff0000);
+                console.log("change cloud color");
+                break;
+            };
+            i+=1;
+        };
+    })
     document.addEventListener('DOMContentLoaded', () => {
 
         var logo = document.getElementById('logo');
         logo.addEventListener('mousedown', () => {
             addCloud();
         });
-
+        
         var home = document.getElementById('home');
         home.addEventListener('mousedown',() => {
             changeTheme('home');
