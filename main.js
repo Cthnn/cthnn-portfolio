@@ -225,24 +225,29 @@ function hexToHexString(hexValue){
     return "#" + hexString;
 };
 
-function createCloud(){
+function createCloud(position){
+
     var sphereGeo = new THREE.SphereGeometry(.50,30,30);
-    sphereGeo.translate(-4,0,0);
+    sphereGeo.translate(0,0,-0.4);
     
     var sphere1Geo = new THREE.SphereGeometry(.50,30,30);
-    sphere1Geo.translate(-3.4,0,0);
+    sphere1Geo.translate(0,0,0.4);
 
     var sphere2Geo = new THREE.SphereGeometry(.50,32,32);
-    sphere2Geo.translate(-3.7,0.4,0.2);
+    sphere2Geo.translate(0,0.5,0);
 
     var sphere3Geo = new THREE.SphereGeometry(.50,32,32);
-    sphere3Geo.translate(-3.7,0,0.4);
+    sphere3Geo.translate(-0.4,0,0);
 
-    var cloudGeo = BufferGeometryUtils.mergeGeometries([sphereGeo, sphere1Geo, sphere2Geo, sphere3Geo]);
+    var sphere4Geo = new THREE.SphereGeometry(.50,32,32);
+    sphere4Geo.translate(0.4,0,0);
+
+    var cloudGeo = BufferGeometryUtils.mergeGeometries([sphereGeo, sphere1Geo, sphere2Geo, sphere3Geo, sphere4Geo]);
     sphereGeo.dispose();
     sphere1Geo.dispose();
     sphere2Geo.dispose();
     sphere3Geo.dispose();
+    sphere4Geo.dispose();
     var x = getRandomArbitrary(10,15);
     var y= getRandomArbitrary(-3,3);
     var z = getRandomArbitrary(-5,4);
@@ -293,6 +298,12 @@ function createNavEventListeners(){
         pointer.x = (event.clientX/window.innerWidth)*2 - 1;
         pointer.y = -(event.clientY/window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
+        if(selected){
+            var intersects = new THREE.Vector3();
+            var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -selected.position.z);
+            raycaster.ray.intersectPlane(plane,intersects);
+            selected.position.set(intersects.x,intersects.y,intersects.z);
+        }
     });
     document.addEventListener('mousedown', (event)=>{
         pointer.x = (event.clientX/window.innerWidth)*2 - 1;
@@ -388,13 +399,6 @@ function animate() {
     }
 
     // Move Clouds
-    // if(selected){
-    //     var intersects = new THREE.Vector3();
-    //     var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -selected.position.z);
-    //     raycaster.ray.intersectPlane(plane,intersects);
-    //     console.log(intersects);
-    //     selected.position.set(intersects.x+4,intersects.y-0.5,intersects.z);
-    // };
     var clouds = scene.getObjectsByProperty('geoType', 'cloud');
     for(let i = 0; i < clouds.length; i++){
 
