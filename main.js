@@ -27,7 +27,6 @@ var raycaster = new THREE.Raycaster();
 var cube = null;
 var textMesh = null;
 var selected = null;
-
 createNavEventListeners();
 
 // Initialize Home Page Geometries
@@ -63,10 +62,14 @@ function initThree(){
     var textureloader = new THREE.TextureLoader();
 
     // Lighting
-    var cameralight = new THREE.RectAreaLight( 0xffffff, 0.8, 100, 100 );
-    cameralight.position.set(10,10,5);
-    cameralight.lookAt(0,-6,-25);
-    scene.add( cameralight );
+    // var ambientLight = new THREE.AmbientLight(0xffffff, 2);
+    var dl = new THREE.DirectionalLight( 0xffffff, 5);
+    var dlHelper = new THREE.DirectionalLightHelper(dl, 50);
+    dl.position.set(-5,10,8);
+    dl.lookAt(0,0,-8);
+    // scene.add(ambientLight);
+    scene.add( dl );
+    
 
     return [scene, camera, loader, renderer, textureloader];
 }
@@ -94,11 +97,12 @@ function changeTheme(theme){
     });
 };
 
-function spawnObjects(){
+async function spawnObjects(){
     if (THEME == 'home'){
         scene.add(cube);
-        if(textMesh && scene.getObjectsByProperty('geoType',"text").length < 1){
+        if(textMesh && !textMesh.showing){
             scene.add(textMesh);
+            textMesh.showing = true;
         };
     }else if(THEME =="about"){
         if (!document.getElementById('about-box')) {
@@ -108,7 +112,7 @@ function spawnObjects(){
             var innerAbout = document.createElement('div');
             innerAbout.id = "inner-about";
             var maskImage = document.createElement('img');
-            maskImage.src = 'assets/masked.jpg';
+            maskImage.src = 'assets/masked.png';
             maskImage.id = "mask-image";
             var aboutMe = document.createElement('div');
             aboutMe.id = "about-me";
@@ -171,14 +175,20 @@ function spawnObjects(){
 };
 
 async function initHomeGeos(){
-    var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
+    var cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+    var face1 = createTexturedMaterial({map: loadTexture(textureloader, "assets/bean.png")}, THREE.MeshPhongMaterial);
+    var face2 = createTexturedMaterial({map: loadTexture(textureloader, "assets/doja.png")}, THREE.MeshPhongMaterial);
+    var face3 = createTexturedMaterial({map: loadTexture(textureloader, "assets/headshot.png")}, THREE.MeshPhongMaterial);
+    var face4 = createTexturedMaterial({map: loadTexture(textureloader, "assets/me.png")}, THREE.MeshPhongMaterial);
+    var face5 = createTexturedMaterial({map: loadTexture(textureloader, "assets/masked.png")}, THREE.MeshPhongMaterial);
+    var face6 = createTexturedMaterial({map: loadTexture(textureloader, "assets/art.png")}, THREE.MeshPhongMaterial);
     var cubeMaterial = [
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/bean.png")}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/me.jpg")}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/doja.jpg")}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/art.jpg")}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/headshot.jpg")}, THREE.MeshBasicMaterial),
-        createTexturedMaterial({map: loadTexture(textureloader, "assets/masked.jpg")}, THREE.MeshBasicMaterial),
+        face1,
+        face2,
+        face3,
+        face4,
+        face5,
+        face6,
     ];
     loader.load( 'node_modules/three/examples/fonts/ttf/kenpixel.ttf',(json) =>{
         var font = new Font(json);
@@ -206,10 +216,12 @@ async function initHomeGeos(){
         introText.geoType = "text";
         introText.position.set(-8.5,0,-6);
         textMesh = introText;
+        textMesh.showing = false;
     });
     cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
     cube.geoType = "cube";
-    cube.position.set(3,0,-5);  
+    cube.position.set(1.5,0,-2);
+    console.log("cube created");  
 };
 
 function getRandomArbitrary(min, max) {
@@ -265,7 +277,7 @@ function createCloud(){
     if (THEME == "about"){
         cloudColor.color = 0x707070;
     }
-    var cloudMaterial = createTexturedMaterial(cloudColor, THREE.MeshStandardMaterial);
+    var cloudMaterial = createTexturedMaterial(cloudColor, THREE.MeshPhongMaterial);
 
     var resCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
     resCloud.position.set(x,y,z);
@@ -286,16 +298,12 @@ function despawnCloud(cloud){
     scene.remove(cloud);
 };
 
-function clearObjects(){
-    var clouds = scene.getObjectsByProperty('geoType', 'cloud');
-
-    clouds.forEach(cloud =>{
-        despawnCloud(cloud);
-    });
-    scene.remove(cube);
+async function clearObjects(){
     if(textMesh){
         scene.remove(textMesh);
+        textMesh.showing = false;
     }
+    scene.remove(cube);
     var aboutBox = document.getElementById('about-box');
     if (aboutBox) {
         aboutBox.remove();
@@ -304,6 +312,12 @@ function clearObjects(){
     if (contactBox) {
         contactBox.remove();
     }
+    var clouds = scene.getObjectsByProperty('geoType', 'cloud');
+
+    clouds.forEach(cloud =>{
+        despawnCloud(cloud);
+    });
+    
 };
 
 async function createNavEventListeners(){
@@ -365,6 +379,7 @@ async function createNavEventListeners(){
         home.addEventListener('mousedown',() => {
             changeTheme('home');
             clearObjects();
+            console.log("changing theme to home");
             spawnObjects();
         });
         var about = document.getElementById('about');
@@ -407,7 +422,7 @@ function animate() {
         console.log("spawned cloud");
     };
     spawnCounter -= 1;
-    if(textMesh){
+    if(textMesh && textMesh.showing){
         textMesh.position.z += incrementor;
         if(textMesh.position.z <= -6.05){
             incrementor = 0.001;
@@ -422,9 +437,10 @@ function animate() {
         cube.rotation.x += 0.01;
 	    cube.rotation.y += 0.01;
     });
-    var textMeshs = scene.getObjectsByProperty('geoType','text');
-    if (THEME == "home" && textMeshs.length == 0 && textMesh){
+
+    if (THEME == "home" && textMesh && !textMesh.showing){
         scene.add(textMesh);
+        textMesh.showing = true;
     }
 
     // Move Clouds
