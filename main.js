@@ -12,6 +12,7 @@ var textureloader = initThreeOutputs[4];
 var pointer = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 var selected = null;
+var incrementor = 0.001;
 createNavEventListeners();
 
 
@@ -40,7 +41,7 @@ function initThree(){
 
     // Define Camera
     var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set(-3.5,0,5);
+    camera.position.set(0,0,0);
 
     //Define FontLoader
     var loader = new FontLoader();
@@ -56,9 +57,9 @@ function initThree(){
     var textureloader = new THREE.TextureLoader();
 
     // Lighting
-    var cameralight = new THREE.RectAreaLight( 0xffffff, 1, 30, 30 );
-    cameralight.position.set(-10,10,5);
-    cameralight.lookAt(10,0,0);
+    var cameralight = new THREE.RectAreaLight( 0xffffff, 0.8, 100, 100 );
+    cameralight.position.set(10,10,5);
+    cameralight.lookAt(0,-6,-25);
     scene.add( cameralight );
 
     return [scene, camera, loader, renderer, textureloader];
@@ -190,16 +191,18 @@ function initHomeGeos(){
             bevelSize: 1,
             bevelThickness: 1,
         } );
-        textgeo.translate(-12,0,-1);
-        textgeo1.translate(-12,-1.5,-1);
+        textgeo.translate(0,0,0);
+        textgeo1.translate(0,-1.5,0);
         var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
-        var textMaterial = createTexturedMaterial({ color: THEMES[THEME].secondary }, THREE.MeshStandardMaterial);
+        var textMaterial = createTexturedMaterial({ color: THEMES[THEME].secondary, transparent: true, opacity:0.75 }, THREE.MeshStandardMaterial);
         var introText = new THREE.Mesh(introgeo,textMaterial);
         introText.geoType = "text";
+        introText.position.set(-8.5,0,-6);
         textMesh = introText;
     });
     cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
     cube.geoType = "cube";
+    cube.position.set(3,0,-5);  
 };
 
 function getRandomArbitrary(min, max) {
@@ -248,11 +251,11 @@ function createCloud(position){
     sphere2Geo.dispose();
     sphere3Geo.dispose();
     sphere4Geo.dispose();
-    var x = getRandomArbitrary(10,15);
+    var x = getRandomArbitrary(5,15);
     var y= getRandomArbitrary(-3,3);
-    var z = getRandomArbitrary(-5,4);
+    var z = getRandomArbitrary(-6,-1);
 
-    var cloudMaterial = createTexturedMaterial({ color: 0xffffff }, THREE.MeshStandardMaterial);
+    var cloudMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 }, THREE.MeshStandardMaterial);
 
     var resCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
     resCloud.position.set(x,y,z);
@@ -315,9 +318,10 @@ function createNavEventListeners(){
             while (cloud == null && i < intersects.length){
                 if(intersects[i].object.geoType == 'cloud'){
                     cloud = intersects[i].object;
-                    selected = cloud;
-                    cloud.material.color.set(0xff0000);
+                    console.log("changing opacity");
+                    cloud.material.opacity = 1;
                     cloud.move = false;
+                    selected = cloud;
                     break;
                 };
                 i+=1;
@@ -329,7 +333,7 @@ function createNavEventListeners(){
         if(selected){
             var tempSelected = selected;
             selected = null;
-            tempSelected.material.color.set(0xffffff);
+            tempSelected.material.opacity = 0.75;
             tempSelected.move = true;    
         }
     });
@@ -377,7 +381,6 @@ function getCurrentPage() {
       return 'home'; // or whatever you consider the default page
     };
   };
-
 function animate() {
 
     // Spawn Cloud when counter is 0
@@ -386,7 +389,16 @@ function animate() {
         addCloud();
     };
     spawnCounter -= 0;
-
+    if(textMesh){
+        textMesh.position.z += incrementor;
+        if(textMesh.position.z <= -6){
+            incrementor = 0.001;
+        };
+        if(textMesh.position.z >= -5.7){
+            incrementor = -0.001;
+        };
+        console.log(textMesh.position);
+    }
     // Rotate Cube (Turn this into a function)
     var cubes = scene.getObjectsByProperty('geoType', 'cube');
     cubes.forEach(cube =>{
