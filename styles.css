@@ -36,6 +36,7 @@ body{
     z-index: 1;
 }
 .themes{
+    user-select: none;
     padding: 10px;
     z-index: 1;
 }
@@ -59,6 +60,7 @@ body{
     z-index: 1;
 }
 #inner-about{
+    user-select: none;
     width:79vw;
     height:67vh;
     background-color: rgba(92, 92, 92, 0.7);

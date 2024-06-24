@@ -14,6 +14,18 @@ var pointer = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 var selected = null;
 var incrementor = 0.001;
+function updateSize() {
+    // Update camera
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+};
+updateSize();
+window.addEventListener('resize', updateSize);
 createNavEventListeners();
 
 
@@ -230,7 +242,7 @@ function hexToHexString(hexValue){
     return "#" + hexString;
 };
 
-function createCloud(position){
+function createCloud(){
 
     var sphereGeo = new THREE.SphereGeometry(.50,30,30);
     sphereGeo.translate(0,0,-0.4);
@@ -253,9 +265,9 @@ function createCloud(position){
     sphere2Geo.dispose();
     sphere3Geo.dispose();
     sphere4Geo.dispose();
-    var x = getRandomArbitrary(5,15);
+    var x = getRandomArbitrary(8,15);
     var y= getRandomArbitrary(-3,3);
-    var z = getRandomArbitrary(-6,-1);
+    var z = getRandomArbitrary(-10,-2);
 
     var cloudMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 }, THREE.MeshStandardMaterial);
 
