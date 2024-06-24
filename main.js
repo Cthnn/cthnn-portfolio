@@ -1,6 +1,7 @@
 import * as THREE from 'three'; 
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { Font, FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 // Initialization
 var initThreeOutputs = initThree();
@@ -44,7 +45,7 @@ function initThree(){
     camera.position.set(0,0,0);
 
     //Define FontLoader
-    var loader = new FontLoader();
+    var loader = new TTFLoader();
 
     // Define Renderer
     var renderer = new THREE.WebGLRenderer( {alpha: true} );
@@ -174,7 +175,8 @@ function initHomeGeos(){
         createTexturedMaterial({map: loadTexture(textureloader, "assets/headshot.jpg")}, THREE.MeshBasicMaterial),
         createTexturedMaterial({map: loadTexture(textureloader, "assets/masked.jpg")}, THREE.MeshBasicMaterial),
     ];
-    loader.load( 'node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json',(font) =>{
+    loader.load( 'node_modules/three/examples/fonts/ttf/kenpixel.ttf',(json) =>{
+        var font = new Font(json);
         var textgeo = new TextGeometry( 'HI,', {
             size: 1,
             height: 1,
@@ -194,7 +196,7 @@ function initHomeGeos(){
         textgeo.translate(0,0,0);
         textgeo1.translate(0,-1.5,0);
         var introgeo = BufferGeometryUtils.mergeGeometries([textgeo, textgeo1]);
-        var textMaterial = createTexturedMaterial({ color: THEMES[THEME].secondary, transparent: true, opacity:0.75 }, THREE.MeshStandardMaterial);
+        var textMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity:0.75 }, THREE.MeshStandardMaterial);
         var introText = new THREE.Mesh(introgeo,textMaterial);
         introText.geoType = "text";
         introText.position.set(-8.5,0,-6);
@@ -318,7 +320,6 @@ function createNavEventListeners(){
             while (cloud == null && i < intersects.length){
                 if(intersects[i].object.geoType == 'cloud'){
                     cloud = intersects[i].object;
-                    console.log("changing opacity");
                     cloud.material.opacity = 1;
                     cloud.move = false;
                     selected = cloud;
@@ -391,13 +392,12 @@ function animate() {
     spawnCounter -= 0;
     if(textMesh){
         textMesh.position.z += incrementor;
-        if(textMesh.position.z <= -6){
+        if(textMesh.position.z <= -6.05){
             incrementor = 0.001;
         };
-        if(textMesh.position.z >= -5.7){
+        if(textMesh.position.z >= -5.95){
             incrementor = -0.001;
         };
-        console.log(textMesh.position);
     }
     // Rotate Cube (Turn this into a function)
     var cubes = scene.getObjectsByProperty('geoType', 'cube');
