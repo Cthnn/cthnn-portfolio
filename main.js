@@ -3,6 +3,18 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { Font, FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+// Theme Vars
+var incrementor = 0.001;
+var THEMES = {
+    "home": {primary:0x3760a7, secondary:0xffffff, navcolor:0xffffff},
+    "about": {primary:0x858585, secondary:0xe6e600, navcolor:0xe6e600},
+    "projects": {primary:0x292929, secondary:0xffff00, navcolor:0x858585},
+    "contact": {primary:0xaaaaee, secondary:0xffe4b3, navcolor:0xffe4b3},
+}
+var THEME = getCurrentPage();
+changeTheme(THEME);
+
 // Initialization
 var initThreeOutputs = initThree();
 var scene = initThreeOutputs[0];
@@ -12,39 +24,20 @@ var renderer = initThreeOutputs[3];
 var textureloader = initThreeOutputs[4];
 var pointer = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
-var selected = null;
-var incrementor = 0.001;
-function updateSize() {
-    // Update camera
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    // Update renderer
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-};
-updateSize();
-window.addEventListener('resize', updateSize);
-createNavEventListeners();
-
-
-var THEMES = {
-    "home": {primary:0x3760a7, secondary:0xffffff, navcolor:0xffffff},
-    "about": {primary:0x858585, secondary:0xe6e600, navcolor:0xe6e600},
-    "projects": {primary:0x292929, secondary:0xffff00, navcolor:0x858585},
-    "contact": {primary:0xaaaaee, secondary:0xffe4b3, navcolor:0xffe4b3},
-}
-var THEME = getCurrentPage();
-
-//Timer 
-var spawnCounter = 0;
 var cube = null;
 var textMesh = null;
+var selected = null;
+
+createNavEventListeners();
 
 // Initialize Home Page Geometries
 initHomeGeos();
-changeTheme(THEME);
+
+
+//Timer 
+var spawnCounter = 0;
+
+
 spawnObjects();
 
 function initThree(){
@@ -104,7 +97,7 @@ function changeTheme(theme){
 function spawnObjects(){
     if (THEME == 'home'){
         scene.add(cube);
-        if(textMesh && scene.getObjectsByProperty('geoType',"text").length <= 1){
+        if(textMesh && scene.getObjectsByProperty('geoType',"text").length < 1){
             scene.add(textMesh);
         };
     }else if(THEME =="about"){
@@ -177,7 +170,7 @@ function spawnObjects(){
     };
 };
 
-function initHomeGeos(){
+async function initHomeGeos(){
     var cubeGeometry = new THREE.BoxGeometry( 2.5, 2.5, 2.5 );
     var cubeMaterial = [
         createTexturedMaterial({map: loadTexture(textureloader, "assets/bean.png")}, THREE.MeshBasicMaterial),
@@ -268,8 +261,11 @@ function createCloud(){
     var x = getRandomArbitrary(8,15);
     var y= getRandomArbitrary(-3,3);
     var z = getRandomArbitrary(-10,-2);
-
-    var cloudMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 }, THREE.MeshStandardMaterial);
+    var cloudColor = { color: 0xffffff, transparent: true, opacity: 0.75 };
+    if (THEME == "about"){
+        cloudColor.color = 0x707070;
+    }
+    var cloudMaterial = createTexturedMaterial(cloudColor, THREE.MeshStandardMaterial);
 
     var resCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
     resCloud.position.set(x,y,z);
@@ -310,7 +306,15 @@ function clearObjects(){
     }
 };
 
-function createNavEventListeners(){
+async function createNavEventListeners(){
+    window.addEventListener('resize', function(){
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    
+        // Update renderer
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
     document.addEventListener('mousemove', (event) =>{
         pointer.x = (event.clientX/window.innerWidth)*2 - 1;
         pointer.y = -(event.clientY/window.innerHeight) * 2 + 1;
@@ -398,10 +402,11 @@ function animate() {
 
     // Spawn Cloud when counter is 0
     if (spawnCounter <= 0){
-        spawnCounter = getRandomArbitrary(100,500);
+        spawnCounter = getRandomArbitrary(150,275);
         addCloud();
+        console.log("spawned cloud");
     };
-    spawnCounter -= 0;
+    spawnCounter -= 1;
     if(textMesh){
         textMesh.position.z += incrementor;
         if(textMesh.position.z <= -6.05){
