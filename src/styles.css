@@ -72,6 +72,43 @@ body{
     flex-direction: row-reverse;
     z-index: 1;
 }
+#projects-box{
+    width:80vw;
+    height:70vh;
+    border: 2px solid yellow;
+    border-radius: 15px;
+    margin-top: 4vh;
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items:center;
+    z-index: 1;
+}
+#inner-projects{
+    user-select: none;
+    width:79vw;
+    height:67vh;
+    background-color: rgba(92, 92, 92, 0.7);
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row-reverse;
+    z-index: 1;
+}
+#projs{
+    display:flex;
+    width: 40vw;
+    height:30vw;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#construction-gif{
+    width:20vw;
+    height:20vw;
+    z-index:1;
+}
 #contact-box{
     width:60vw;
     height:60vh;
@@ -85,6 +122,11 @@ body{
     z-index: 1;
 }
 #mask-image{
+    width: 30vw;
+    height:30vw;
+    z-index:1;
+}
+#gh-gif{
     width:30vw;
     height:30vw;
     z-index:1;
@@ -97,6 +139,11 @@ h1{
     text-underline-offset: 1vh;
     text-decoration-thickness: 1vh;
 
+}
+h3{
+    font-size: 2vw;
+    font-family: "Pixelify Sans";
+    color: yellow;
 }
 h2{
     font-family: "Pixelify Sans";

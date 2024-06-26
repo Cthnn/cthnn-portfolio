@@ -5,6 +5,7 @@ import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 // Theme Vars
+var scale = (1495-window.innerWidth)/515;
 var incrementor = 0.001;
 var THEMES = {
     "home": {primary:0x3760a7, secondary:0xffffff, navcolor:0xffffff},
@@ -112,7 +113,7 @@ async function spawnObjects(){
             var innerAbout = document.createElement('div');
             innerAbout.id = "inner-about";
             var maskImage = document.createElement('img');
-            maskImage.src = 'assets/masked.png';
+            maskImage.src = 'public/masked.png';
             maskImage.id = "mask-image";
             var aboutMe = document.createElement('div');
             aboutMe.id = "about-me";
@@ -138,7 +139,32 @@ async function spawnObjects(){
             document.getElementById('nav').appendChild(aboutBox);
         };
     }else if(THEME == "projects"){
-        console.log("test");
+        var projectBox = document.createElement('div');
+            projectBox.id = 'projects-box';
+            var innerProject = document.createElement('div');
+            innerProject.id = "inner-projects";
+            var construction = document.createElement('img');
+            construction.src = 'public/under_construction.gif';
+            construction.id = "construction-gif";
+            var projs = document.createElement('div');
+            projs.id = "projs";
+            var projectTxt = document.createElement('h3');
+            projectTxt.textContent = "Under Construction. Check My Github:"
+            var gh = document.createElement('img');
+            gh.addEventListener('mousedown', () => {
+                window.location.href = 'https://github.com/Cthnn';
+            });
+            gh.src = 'public/gh.gif';
+            gh.id = "gh-gif";
+            projs.appendChild(projectTxt);
+            projs.appendChild(construction);
+            innerProject.appendChild(gh);
+            innerProject.appendChild(projs);
+            projectBox.appendChild(innerProject);
+
+
+            // Append the new div to the content div
+            document.getElementById('nav').appendChild(projectBox);
     }else if(THEME == "contact"){
         var contactBox = document.createElement('div');
         contactBox.id = 'contact-box';
@@ -176,12 +202,12 @@ async function spawnObjects(){
 
 async function initHomeGeos(){
     var cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-    var face1 = createTexturedMaterial({map: loadTexture(textureloader, "assets/bean.png")}, THREE.MeshPhongMaterial);
-    var face2 = createTexturedMaterial({map: loadTexture(textureloader, "assets/doja.png")}, THREE.MeshPhongMaterial);
-    var face3 = createTexturedMaterial({map: loadTexture(textureloader, "assets/headshot.png")}, THREE.MeshPhongMaterial);
-    var face4 = createTexturedMaterial({map: loadTexture(textureloader, "assets/me.png")}, THREE.MeshPhongMaterial);
-    var face5 = createTexturedMaterial({map: loadTexture(textureloader, "assets/masked.png")}, THREE.MeshPhongMaterial);
-    var face6 = createTexturedMaterial({map: loadTexture(textureloader, "assets/art.png")}, THREE.MeshPhongMaterial);
+    var face1 = createTexturedMaterial({map: loadTexture(textureloader, "public/bean.png")}, THREE.MeshPhongMaterial);
+    var face2 = createTexturedMaterial({map: loadTexture(textureloader, "public/doja.png")}, THREE.MeshPhongMaterial);
+    var face3 = createTexturedMaterial({map: loadTexture(textureloader, "public/headshot.png")}, THREE.MeshPhongMaterial);
+    var face4 = createTexturedMaterial({map: loadTexture(textureloader, "public/me.png")}, THREE.MeshPhongMaterial);
+    var face5 = createTexturedMaterial({map: loadTexture(textureloader, "public/masked.png")}, THREE.MeshPhongMaterial);
+    var face6 = createTexturedMaterial({map: loadTexture(textureloader, "public/art.png")}, THREE.MeshPhongMaterial);
     var cubeMaterial = [
         face1,
         face2,
@@ -190,7 +216,7 @@ async function initHomeGeos(){
         face5,
         face6,
     ];
-    loader.load( 'node_modules/three/examples/fonts/ttf/kenpixel.ttf',(json) =>{
+    loader.load( 'public/kenpixel.ttf',(json) =>{
         var font = new Font(json);
         var textgeo = new TextGeometry( 'HI,', {
             size: 1,
@@ -214,14 +240,18 @@ async function initHomeGeos(){
         var textMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity:0.75 }, THREE.MeshStandardMaterial);
         var introText = new THREE.Mesh(introgeo,textMaterial);
         introText.geoType = "text";
-        introText.position.set(-8.5,0,-6);
+        var textScale = scale < 0 ? 0: -50*scale;
+        console.log(scale);
+        console.log(window.innerWidth);
+        console.log(textScale);
+        introText.position.set(-8.5,0,-6+textScale);
         textMesh = introText;
         textMesh.showing = false;
     });
     cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
     cube.geoType = "cube";
-    cube.position.set(1.5,0,-2);
-    console.log("cube created");  
+    var cubeScale = scale < 0 ? 0: -10*scale;
+    cube.position.set(1.5,0,-2+cubeScale);  
 };
 
 function getRandomArbitrary(min, max) {
@@ -312,6 +342,10 @@ async function clearObjects(){
     if (contactBox) {
         contactBox.remove();
     }
+    var projectsBox = document.getElementById('projects-box');
+    if(projectsBox){
+        projectsBox.remove();
+    }
     var clouds = scene.getObjectsByProperty('geoType', 'cloud');
 
     clouds.forEach(cloud =>{
@@ -322,6 +356,19 @@ async function clearObjects(){
 
 async function createNavEventListeners(){
     window.addEventListener('resize', function(){
+        scale = (1495-window.innerWidth)/515;
+        if(textMesh){
+            var textScale = scale < 0 ? 0: -50*scale;
+            console.log(scale);
+            console.log(window.innerWidth);
+            console.log(textScale);
+            textMesh.position.set(textMesh.position.x,textMesh.position.y,-6+textScale);
+            console.log(textMesh.position);
+        }
+        if(cube){
+            var cubeScale = scale < 0 ? 0: -10*scale;
+            cube.position.set(cube.position.x,cube.position.y,-2+cubeScale);
+        }
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
     
@@ -379,7 +426,6 @@ async function createNavEventListeners(){
         home.addEventListener('mousedown',() => {
             changeTheme('home');
             clearObjects();
-            console.log("changing theme to home");
             spawnObjects();
         });
         var about = document.getElementById('about');
@@ -419,7 +465,6 @@ function animate() {
     if (spawnCounter <= 0){
         spawnCounter = getRandomArbitrary(150,275);
         addCloud();
-        console.log("spawned cloud");
     };
     spawnCounter -= 1;
     if(textMesh && textMesh.showing){
