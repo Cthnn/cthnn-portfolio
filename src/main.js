@@ -74,7 +74,17 @@ function initThree(){
 
     return [scene, camera, loader, renderer, textureloader];
 }
-
+function scaleDepth(range){
+    var slope = ((1495/715)-(360/1080))/-range;
+    var depth = ((window.innerWidth/window.innerHeight)-(1495/715))/slope;
+    if(depth > range){
+        depth = range;
+    };
+    if(depth < 0){
+        depth = 0;
+    };
+    return depth;
+}
 function changeTheme(theme){
     // Change theme colors
     THEME = theme;
@@ -240,18 +250,14 @@ async function initHomeGeos(){
         var textMaterial = createTexturedMaterial({ color: 0xffffff, transparent: true, opacity:0.75 }, THREE.MeshStandardMaterial);
         var introText = new THREE.Mesh(introgeo,textMaterial);
         introText.geoType = "text";
-        var textScale = scale < 0 ? 0: -50*scale;
-        console.log(scale);
-        console.log(window.innerWidth);
-        console.log(textScale);
-        introText.position.set(-8.5,0,-6+textScale);
+        introText.position.set(-8.5,0,-6-scaleDepth(50));
+        introText.baseDepth = introText.position.z;
         textMesh = introText;
         textMesh.showing = false;
     });
     cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
     cube.geoType = "cube";
-    var cubeScale = scale < 0 ? 0: -10*scale;
-    cube.position.set(1.5,0,-2+cubeScale);  
+    cube.position.set(1.5,0,-2-scaleDepth(10));  
 };
 
 function getRandomArbitrary(min, max) {
@@ -356,18 +362,12 @@ async function clearObjects(){
 
 async function createNavEventListeners(){
     window.addEventListener('resize', function(){
-        scale = (1495-window.innerWidth)/515;
         if(textMesh){
-            var textScale = scale < 0 ? 0: -50*scale;
-            console.log(scale);
-            console.log(window.innerWidth);
-            console.log(textScale);
-            textMesh.position.set(textMesh.position.x,textMesh.position.y,-6+textScale);
-            console.log(textMesh.position);
+            textMesh.position.set(textMesh.position.x,textMesh.position.y,-6-scaleDepth(50));
+            textMesh.baseDepth = textMesh.position.z;
         }
         if(cube){
-            var cubeScale = scale < 0 ? 0: -10*scale;
-            cube.position.set(cube.position.x,cube.position.y,-2+cubeScale);
+            cube.position.set(cube.position.x,cube.position.y,-2-scaleDepth(10));
         }
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -469,10 +469,10 @@ function animate() {
     spawnCounter -= 1;
     if(textMesh && textMesh.showing){
         textMesh.position.z += incrementor;
-        if(textMesh.position.z <= -6.05){
+        if(textMesh.position.z <= textMesh.baseDepth-0.06){
             incrementor = 0.001;
         };
-        if(textMesh.position.z >= -5.95){
+        if(textMesh.position.z >= textMesh.baseDepth+0.06){
             incrementor = -0.001;
         };
     }
