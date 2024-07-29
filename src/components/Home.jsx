@@ -18,8 +18,8 @@ function scaleDepth(range){
 }
 
 export const Home = ({ ...props }) =>{
-    const [ textDepth, setTextDepth ] = useState(-6);
-    const [ cubeDepth, setCubeDepth ] = useState(-2);
+    const [ textDepth, setTextDepth ] = useState(-6-scaleDepth(50));
+    const [ cubeDepth, setCubeDepth ] = useState(-2-scaleDepth(10));
     useEffect(() => {
         const handleResize = () => {
             setTextDepth(-6-scaleDepth(50));

@@ -7,7 +7,7 @@ module.exports = {
       backgroundColor:{
         'home-bg': '#3760a7',
         'about-bg': '#858585',
-        'projects-bg': '#292929',
+        'projects-bg': '#870000',
       },
       fontFamily:{
         'pixelify':['Pixelify Sans', 'sans-serif'],

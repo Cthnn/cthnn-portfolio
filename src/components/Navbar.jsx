@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const colorMap = {
     "home": "#ffffff",
     "about": "#ffff00",
-    "projects": "#858585",
+    "projects": "#d4af37",
     "contact": "#ffe4b3",
 };
 
