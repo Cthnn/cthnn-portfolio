@@ -2,7 +2,7 @@ export const AboutBox = ({ ...props }) =>{
   
     return(
         <>
-            <div style={{zIndex:1}} className="w-[90%] h-[60%] border-2 border-[#ffff00] rounded-xl mt-[1%] flex justify-center flex-col items-center z-1 md:w-3/4 md:h-1/10">
+            <div style={{zIndex:1}} className="w-[90%] h-[60%] border-2 border-[#ffff00] rounded-xl mt-[1%] flex justify-center flex-col items-center z-1 md:w-[75%] md:h-[60%]">
                 <div className="user-select-none w-[99%] h-[99%] bg-[#5c5c5cb3] rounded-xl flex justify-center items-center flex-col z-1">
                     <div className="user-select-none w-[90%] h-[99%] flex justify-center items-center flex-col z-1 md:justify-evenly md:flex-row-reverse">
                         <img style={{userSelect: "none"}} src="/masked.png" className="w-[min(30cqw,30cqh)] z-1 md:w-[min(25cqw,25cqh)]"/>

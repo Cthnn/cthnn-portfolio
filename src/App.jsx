@@ -55,7 +55,7 @@ function App() {
                 </Routes>
               </div>
               <Routes>
-                <Route path="/" element={<div className="w-[90%] h-[72%] border-2 border-[#ffff00] rounded-xl mt-[1%] flex justify-center flex-col items-center z-1 md:w-3/4 md:h-1/10"/>}/> 
+                <Route path="/" element={<div className="w-[90%] h-[72%] md:w-[75%] md:h-[60%]"/>}/> 
                 <Route path="/about" element={<AboutBox/>} />
                 <Route path="/projects" element={<ProjectsBox />} />
                 <Route path="/contact" element={<ContactBox />} /> 
