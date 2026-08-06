@@ -3,7 +3,6 @@ import './App.css';
 import Home from './components/Home';
 import AboutBox from './components/AboutBox';
 import Default from './components/Default';
-import ProjectsBox from './components/ProjectsBox';
 import ContactBox from './components/ContactBox';
 import Navbar from './components/Navbar';
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -57,7 +56,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<div className="w-[90%] h-[72%] md:w-[75%] md:h-[60%]"/>}/> 
                 <Route path="/about" element={<AboutBox/>} />
-                <Route path="/projects" element={<ProjectsBox />} />
+                <Route path="/projects" element={<div className="w-[90%] h-[72%] md:w-[75%] md:h-[60%]"/>} />
                 <Route path="/contact" element={<ContactBox />} /> 
               </Routes>
             </div>
