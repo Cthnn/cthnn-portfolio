@@ -1,3 +1,4 @@
+import os
 from typing import Literal, Optional
 
 from fastapi import FastAPI, HTTPException, Query
@@ -6,12 +7,19 @@ from pydantic import BaseModel, ConfigDict, Field
 
 app = FastAPI(title="cthnn-portfolio metadata api")
 
+cors_origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=cors_origins,
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok"}
 
 
 class WorldObject(BaseModel):

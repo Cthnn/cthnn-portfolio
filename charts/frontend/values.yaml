@@ -1,0 +1,47 @@
+replicaCount: 1
+
+image:
+  repository: cthnn-portfolio-frontend
+  tag: latest
+  pullPolicy: Never
+
+imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+env:
+  # Service DNS name + port of the backend release, e.g. "backend:8000"
+  backendUpstream: "backend:8000"
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 96Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  host: cthnn.dev
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: false
+    secretName: frontend-tls
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
