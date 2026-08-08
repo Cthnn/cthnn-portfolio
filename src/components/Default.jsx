@@ -6,7 +6,7 @@ import WasdControls from './WasdControls';
 import ProximityTrigger from './ProximityTrigger';
 import { Fragment, useEffect, useState } from 'react';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : '';
 const PROJECT_PROXIMITY_RADIUS = 3;
 const ABOUT_CUBE_POSITION = [0, 2, -14];
 
