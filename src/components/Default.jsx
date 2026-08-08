@@ -4,11 +4,26 @@ import { CloudSpawner } from './Spawner';
 import ProjectCube from './ProjectCube';
 import WasdControls from './WasdControls';
 import ProximityTrigger from './ProximityTrigger';
+import Text from './Text';
+import Cube from './Cube';
 import { Fragment, useEffect, useState } from 'react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : '';
 const PROJECT_PROXIMITY_RADIUS = 3;
 const ABOUT_CUBE_POSITION = [0, 2, -14];
+const INTRO_HEIGHT = 5;
+
+function scaleDepth(range){
+    var slope = ((1495/715)-(360/1080))/-range;
+    var depth = ((window.innerWidth/window.innerHeight)-(1495/715))/slope;
+    if(depth > range){
+        depth = range;
+    };
+    if(depth < 0){
+        depth = 0;
+    };
+    return depth;
+}
 
 export const Default = ({ ...props }) =>{
     const { theme, x, y, mousedown } = props;
@@ -16,6 +31,19 @@ export const Default = ({ ...props }) =>{
     const [ projects, setProjects ] = useState([]);
     const [ aboutObject, setAboutObject ] = useState(null);
     const [ nearProjectId, setNearProjectId ] = useState(null);
+    const [ introTextDepth, setIntroTextDepth ] = useState(-6-scaleDepth(33));
+    const [ introCubeDepth, setIntroCubeDepth ] = useState(-2-scaleDepth(6.6));
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIntroTextDepth(-6-scaleDepth(33));
+            setIntroCubeDepth(-2-scaleDepth(6.6));
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     useEffect(() => {
         if(theme != "projects"){
@@ -42,6 +70,8 @@ export const Default = ({ ...props }) =>{
                     <DirectionalLight></DirectionalLight>
                     {theme != "projects" && <CloudSpawner {...props} isThunderCloud={isThunderCloud}/>}
                     {theme == "projects" && <WasdControls x={x} y={y} mousedown={mousedown}/>}
+                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-8.5, INTRO_HEIGHT, introTextDepth]}></Text>}
+                    {theme == "projects" && <Cube scale={1} position={[1.5, INTRO_HEIGHT, introCubeDepth]}></Cube>}
                     {theme == "projects" && sceneObjects.map((p) => (
                         <Fragment key={p.id}>
                             <ProjectCube

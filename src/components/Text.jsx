@@ -44,7 +44,7 @@ export function generateText(){
 
 export const Text = ({ ...props }) => {
     const mesh = useRef(null);
-    const { textdepth } = props;
+    const { textheight } = props;
     var textgeo = new TextGeometry( 'HI,', {
       size: 1,
       depth: 0.1,
@@ -63,16 +63,16 @@ export const Text = ({ ...props }) => {
     textgeo1.translate(0,-1.5,0);
     var introgeo =  mergeGeometries([textgeo,textgeo1]);
     useFrame((state, delta) => {
-      mesh.current.position.z += incrementor;
-      if(mesh.current.position.z <= textdepth-0.06){
+      mesh.current.position.y += incrementor;
+      if(mesh.current.position.y <= textheight-0.06){
         incrementor = 0.001;
       };
-      if(mesh.current.position.z >= textdepth+0.06){
+      if(mesh.current.position.y >= textheight+0.06){
         incrementor = -0.001;
       };
     });
     return (
-      <group ref={mesh} {...props}>
+      <group ref={mesh} {...props} rotation={[Math.PI / 2, 0, 0]}>
         <mesh geometry={introgeo}>
           <meshStandardMaterial color="white" transparent opacity={0.75}/>
         </mesh>
