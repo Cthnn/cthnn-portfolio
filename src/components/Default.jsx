@@ -70,8 +70,8 @@ export const Default = ({ ...props }) =>{
                     <DirectionalLight></DirectionalLight>
                     {theme != "projects" && <CloudSpawner {...props} isThunderCloud={isThunderCloud}/>}
                     {theme == "projects" && <WasdControls x={x} y={y} mousedown={mousedown}/>}
-                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-10 + 3, INTRO_HEIGHT, introCubeDepth + 9 - 3 - 2]}></Text>}
-                    {theme == "projects" && <Cube scale={1} position={[1.5 + 3, INTRO_HEIGHT - 5, introCubeDepth + 8 - 3 - 2]}></Cube>}
+                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-7, INTRO_HEIGHT, introCubeDepth + 3]}></Text>}
+                    {theme == "projects" && <Cube scale={1} position={[2.5, INTRO_HEIGHT - 5, introCubeDepth + 3]}></Cube>}
                     {theme == "projects" && sceneObjects.map((p) => (
                         <Fragment key={p.id}>
                             <ProjectCube
