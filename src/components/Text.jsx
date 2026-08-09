@@ -62,16 +62,17 @@ export const Text = ({ ...props }) => {
     textgeo1.translate(0,-1.5,0);
     var introgeo =  mergeGeometries([textgeo,textgeo1]);
     useFrame((state, delta) => {
-      if(incrementor.current === null){
-        incrementor.current = mesh.current.position.y <= textheight ? 0.001 : -0.001;
-      }
-      mesh.current.position.y += incrementor.current;
-      if(mesh.current.position.y <= textheight-0.06){
-        incrementor.current = 0.001;
-      };
-      if(mesh.current.position.y >= textheight+0.06){
-        incrementor.current = -0.001;
-      };
+      console.log("test");
+      // if(incrementor.current === null){
+      //   incrementor.current = mesh.current.position.y <= textheight ? 0.001 : -0.001;
+      // }
+      // mesh.current.position.y += incrementor.current;
+      // if(mesh.current.position.y <= textheight-0.06){
+      //   incrementor.current = 0.001;
+      // };
+      // if(mesh.current.position.y >= textheight+0.06){
+      //   incrementor.current = -0.001;
+      // };
     });
     return (
       <group ref={mesh} {...props} rotation={[Math.PI / 2, 0, 0]}>
