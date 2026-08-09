@@ -11,7 +11,7 @@ import { Fragment, useEffect, useState } from 'react';
 const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : '';
 const PROJECT_PROXIMITY_RADIUS = 3;
 const ABOUT_CUBE_POSITION = [0, 2, -14];
-const INTRO_HEIGHT = 5;
+const INTRO_HEIGHT = 8;
 
 function scaleDepth(range){
     var slope = ((1495/715)-(360/1080))/-range;
@@ -70,8 +70,8 @@ export const Default = ({ ...props }) =>{
                     <DirectionalLight></DirectionalLight>
                     {theme != "projects" && <CloudSpawner {...props} isThunderCloud={isThunderCloud}/>}
                     {theme == "projects" && <WasdControls x={x} y={y} mousedown={mousedown}/>}
-                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-10 + 3, INTRO_HEIGHT + 3, introCubeDepth + 9 - 3 - 2]}></Text>}
-                    {theme == "projects" && <Cube scale={1} position={[1.5 + 3, INTRO_HEIGHT - 2, introCubeDepth + 8 - 3 - 2]}></Cube>}
+                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-10 + 3, INTRO_HEIGHT, introCubeDepth + 9 - 3 - 2]}></Text>}
+                    {theme == "projects" && <Cube scale={1} position={[1.5 + 3, INTRO_HEIGHT - 5, introCubeDepth + 8 - 3 - 2]}></Cube>}
                     {theme == "projects" && sceneObjects.map((p) => (
                         <Fragment key={p.id}>
                             <ProjectCube
