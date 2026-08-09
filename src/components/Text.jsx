@@ -10,8 +10,6 @@ import { TTFLoader } from 'three/examples/jsm/loaders/TTFLoader.js';
 var loader = new TTFLoader();
 var font = null;
 loader.load('kenpixel.ttf', (json)=>font= new Font(json));
-var incrementor = 0.001;
-
 function createTexture(style, materialFunction){
   return new materialFunction(style);
 };
@@ -44,6 +42,7 @@ export function generateText(){
 
 export const Text = ({ ...props }) => {
     const mesh = useRef(null);
+    const incrementor = useRef(null);
     const { textheight } = props;
     var textgeo = new TextGeometry( 'HI,', {
       size: 1,
@@ -63,12 +62,15 @@ export const Text = ({ ...props }) => {
     textgeo1.translate(0,-1.5,0);
     var introgeo =  mergeGeometries([textgeo,textgeo1]);
     useFrame((state, delta) => {
-      mesh.current.position.y += incrementor;
+      if(incrementor.current === null){
+        incrementor.current = mesh.current.position.y <= textheight ? 0.001 : -0.001;
+      }
+      mesh.current.position.y += incrementor.current;
       if(mesh.current.position.y <= textheight-0.06){
-        incrementor = 0.001;
+        incrementor.current = 0.001;
       };
       if(mesh.current.position.y >= textheight+0.06){
-        incrementor = -0.001;
+        incrementor.current = -0.001;
       };
     });
     return (
