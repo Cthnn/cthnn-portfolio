@@ -66,12 +66,12 @@ export const Default = ({ ...props }) =>{
     return(
         <>
             <div {...props}>
-                <Canvas camera={{ position: [0, 0, 0], fov: 75 }}>
+                <Canvas camera={{ position: [0, 0, 0], fov: 75, rotation: [Math.PI / 2, 0, 0] }}>
                     <DirectionalLight></DirectionalLight>
                     {theme != "projects" && <CloudSpawner {...props} isThunderCloud={isThunderCloud}/>}
                     {theme == "projects" && <WasdControls x={x} y={y} mousedown={mousedown}/>}
-                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-8.5, INTRO_HEIGHT, introCubeDepth]}></Text>}
-                    {theme == "projects" && <Cube scale={1} position={[1.5, INTRO_HEIGHT, introCubeDepth]}></Cube>}
+                    {theme == "projects" && <Text textheight={INTRO_HEIGHT} scale={1} position={[-10, INTRO_HEIGHT + 3, introCubeDepth + 9]}></Text>}
+                    {theme == "projects" && <Cube scale={1} position={[1.5, INTRO_HEIGHT - 2, introCubeDepth + 8]}></Cube>}
                     {theme == "projects" && sceneObjects.map((p) => (
                         <Fragment key={p.id}>
                             <ProjectCube

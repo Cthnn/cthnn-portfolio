@@ -10,7 +10,7 @@ export const WasdControls = ({ x = 0, y = 0, mousedown = 0 }) => {
   const { camera } = useThree();
   const keys = useRef({ w: false, a: false, s: false, d: false, ' ': false, shift: false });
   const yaw = useRef(0);
-  const pitch = useRef(0);
+  const pitch = useRef(Math.PI / 2);
   const prevPointer = useRef({ x, y });
   const wasDragging = useRef(false);
 
